@@ -5,6 +5,7 @@ version = 3
 [[package]]
 name = "bytebuffer"
 version = "0.1.0"
+source = "git+https://github.com/CircuitFire/bytebuffer.git#971e5dac548f38e991208221b8f264396ae3806e"
 
 [[package]]
 name = "tree"
