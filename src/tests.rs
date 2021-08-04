@@ -4,7 +4,7 @@ use Position::*;
 
 fn print_tree<T: std::fmt::Display>(tree: &Tree<T>){
     if let Some(root) = tree.get_root(){
-        for node in tree.sub_tree_from_counted(root).unwrap(){
+        for node in tree.sub_tree_counted(root).unwrap(){
             println!("\"{}\" child count: {}", tree.data_at(node.id).unwrap(), node.child_count);
         }
     }
@@ -20,7 +20,7 @@ fn tree_matches<T: std::fmt::Display + PartialEq>(tree: &Tree<T>, expected: Vec<
     assert_eq!(tree.len(), expected.len());
 
     if let Some(root) = tree.get_root(){
-        for (node_children, expected) in tree.sub_tree_from_counted(root).unwrap().iter().zip(expected.iter()){
+        for (node_children, expected) in tree.sub_tree_counted(root).unwrap().iter().zip(expected.iter()){
             if tree.data_at(node_children.id).unwrap() != &expected.0 || node_children.child_count != expected.1 { return false }
         }
     }
