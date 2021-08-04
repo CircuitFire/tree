@@ -41,9 +41,10 @@ impl<T> Node<T> {
 }
 
 /// The id of a node along with the number of children that it has.
-pub struct NodeChildren{
-    pub child_count: usize,
+pub struct NodeInfo{
     pub id: usize,
+    pub child_count: usize,
+    pub depth: usize,
 }
 
 /// The positions that a node can be placed in relation to another node.
@@ -76,9 +77,9 @@ use TreeErr::*;
 /// - len
 /// - descendants_of
 /// - sub_tree
-/// - sub_tree_counted
+/// - sub_tree_info
 /// - sub_tree_depth
-/// - sub_tree_depth_counted
+/// - sub_tree_depth_info
 /// - children_of
 /// - new_node
 /// - remove
@@ -308,28 +309,29 @@ impl<T> Tree<T> {
         Ok(ids)
     }
 
-    fn sub_tree_counted_helper(&self, id: usize, ids: &mut Vec<NodeChildren>){
+    fn sub_tree_counted_helper(&self, id: usize, ids: &mut Vec<NodeInfo>, cur_depth: usize){
         let index = ids.len();
-        ids.push(NodeChildren{
-            child_count: 0,
+        ids.push(NodeInfo{
             id: id,
+            child_count: 0,
+            depth: cur_depth,
         });
 
         let mut child = self.nodes[id].first_child;
 
         while let Some(child_id) = child {
             ids[index].child_count += 1;
-            self.sub_tree_counted_helper(child_id, ids);
+            self.sub_tree_counted_helper(child_id, ids, cur_depth + 1);
             child = self.nodes[child_id].next_sib;
         }
     }
 
     /// Returns a list starting with the id provided and the number of children it has followed by the same for all of its descendants.
-    pub fn sub_tree_counted(&self, id: usize) -> Result<Vec<NodeChildren>, TreeErr> {
+    pub fn sub_tree_counted(&self, id: usize) -> Result<Vec<NodeInfo>, TreeErr> {
         self.valid_node(id)?;
 
         let mut ids = Vec::new();
-        self.sub_tree_counted_helper(id, &mut ids);
+        self.sub_tree_counted_helper(id, &mut ids, 0);
 
         Ok(ids)
     }
@@ -362,11 +364,12 @@ impl<T> Tree<T> {
         Ok(ids)
     }
 
-    fn sub_tree_depth_counted_helper(&self, id: usize, ids: &mut Vec<NodeChildren>, depth: usize){
+    fn sub_tree_depth_counted_helper(&self, id: usize, ids: &mut Vec<NodeInfo>, cur_depth: usize, target: usize){
         let index = ids.len();
-        ids.push(NodeChildren{
-            child_count: 0,
+        ids.push(NodeInfo{
             id: id,
+            child_count: 0,
+            depth: cur_depth,
         });
 
         let mut child = self.nodes[id].first_child;
@@ -374,8 +377,8 @@ impl<T> Tree<T> {
         while let Some(child_id) = child {
             ids[index].child_count += 1;
 
-            if depth > 0 {
-                self.sub_tree_depth_counted_helper(child_id, ids, depth - 1);
+            if cur_depth < target {
+                self.sub_tree_depth_counted_helper(child_id, ids, cur_depth + 1, target);
             }
 
             child = self.nodes[child_id].next_sib;
@@ -383,13 +386,13 @@ impl<T> Tree<T> {
     }
 
     /// Returns a list starting with the id provided and the number of children it has followed by the same for all of its descendants up to the given depth.
-    pub fn sub_tree_depth_counted(&self, id: usize, depth: usize) -> Result<Vec<NodeChildren>, TreeErr> {
+    pub fn sub_tree_depth_counted(&self, id: usize, depth: usize) -> Result<Vec<NodeInfo>, TreeErr> {
         self.valid_node(id)?;
 
         let mut ids = Vec::new();
 
         if depth > 0 {
-            self.sub_tree_depth_counted_helper(id, &mut ids, depth - 1);
+            self.sub_tree_depth_counted_helper(id, &mut ids, 1, depth);
         }
 
         Ok(ids)
@@ -569,7 +572,7 @@ impl<T: Copy + Clone> Tree<T> {
 /// The u8 iterator for all of the data in the tree.
 pub struct TreeIter<'a, T>{
     tree: &'a Tree<T>,
-    nodes_iter: std::vec::IntoIter<NodeChildren>,
+    nodes_iter: std::vec::IntoIter<NodeInfo>,
     data_iter: Box<dyn std::iter::Iterator<Item = u8> + 'a>,
 }
 
