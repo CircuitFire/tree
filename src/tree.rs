@@ -41,6 +41,7 @@ impl<T> Node<T> {
 }
 
 /// The id of a node along with the number of children that it has.
+#[derive(Clone, Copy)]
 pub struct NodeInfo{
     pub id: usize,
     pub child_count: usize,
