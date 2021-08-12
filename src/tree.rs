@@ -362,7 +362,7 @@ impl<T> Tree<T> {
         if depth > 0 {
             self.sub_tree_depth_helper(id, &mut ids, depth - 1);
         }
-
+        
         Ok(ids)
     }
 
@@ -393,9 +393,7 @@ impl<T> Tree<T> {
 
         let mut ids = Vec::new();
 
-        if depth > 0 {
-            self.sub_tree_depth_info_helper(id, &mut ids, 1, depth);
-        }
+        self.sub_tree_depth_info_helper(id, &mut ids, 0, depth);
 
         Ok(ids)
     }
