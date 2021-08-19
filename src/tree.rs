@@ -49,6 +49,7 @@ pub struct NodeInfo{
 }
 
 /// The positions that a node can be placed in relation to another node.
+#[derive(PartialEq)]
 pub enum Position {
     FirstChild,
     LastChild,
