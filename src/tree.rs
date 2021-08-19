@@ -540,12 +540,12 @@ impl<T> Tree<T> {
     }
 }
 
-impl<T: Copy + Clone> Tree<T> {
+impl<T: Clone> Tree<T> {
     fn clone_children(&mut self, old_parent: usize, new_parent: usize){
         let mut old_child = self.nodes[old_parent].first_child;
 
         while let Some(old_child_id) = old_child {
-            let new_child = self.get_node(self.nodes[old_child_id].data.unwrap().clone());
+            let new_child = self.get_node(self.nodes[old_child_id].data.clone().unwrap());
             self.append_child(new_parent, new_child);
             self.clone_children(old_child_id, new_child);
             old_child = self.nodes[old_child_id].next_sib;
@@ -553,7 +553,7 @@ impl<T: Copy + Clone> Tree<T> {
     }
 
     fn clone_node(&mut self, id: usize) -> usize {
-        let new = self.get_node(self.nodes[id].data.unwrap().clone());
+        let new = self.get_node(self.nodes[id].data.clone().unwrap());
         self.clone_children(id, new);
         new
     }
