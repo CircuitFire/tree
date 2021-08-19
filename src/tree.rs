@@ -274,6 +274,9 @@ impl<T> Tree<T> {
         else if let Some(parent) = self.nodes[id].parent {
             self.nodes[parent].last_child = self.nodes[id].prev_sib;
         }
+
+        self.nodes[id].prev_sib = None;
+        self.nodes[id].next_sib = None;
     }
 
     /// Returns the number of nodes currently in the tree.
